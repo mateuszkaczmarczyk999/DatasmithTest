@@ -1,0 +1,56 @@
+# --- Unreal Engine: ignore everything generated or binary ---
+# Project outputs & caches
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+*.VC.db
+*.suo
+*.opensdf
+*.sdf
+*.log
+*.tlog
+
+# Cooked / packaged
+Build/WindowsNoEditor/
+WindowsNoEditor/
+LinuxNoEditor/
+MacNoEditor/
+*.target
+*.rsp
+
+# Object & symbol files
+*.obj
+*.pdb
+*.ipdb
+*.iobj
+*.pch
+*.idb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+*.dylib
+*.so
+
+# Unreal assets (binary)
+Content/**
+!Content/.gitkeep
+!Content/README.md
+
+# Plugin build artifacts (keep only plugin source & .uplugin)
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+Plugins/*/DerivedDataCache/
+Plugins/*/Saved/
+Plugins/*/Content/**
+
+# IDE
+*.sln
+*.xcodeproj
+*.xcworkspace
+.DS_Store
+Thumbs.db
