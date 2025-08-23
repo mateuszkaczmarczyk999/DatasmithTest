@@ -10,28 +10,6 @@
 void UCADSyncSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
-
-    /*if (UWorld* World = GetWorld()) {
-		FTransform Transform = FTransform::Identity;
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Name = TEXT("DatasmithAnchor");
-		Anchor = World->SpawnActor<ADatasmithRuntimeActor>(ADatasmithRuntimeActor::StaticClass(), Transform, SpawnParams);
-
-		FDatasmithRuntimeImportOptions ImportOptions;
-		ImportOptions.BuildHierarchy = EBuildHierarchyMethod::Simplified;
-		ImportOptions.BuildCollisions = ECollisionEnabled::NoCollision;
-		ImportOptions.bImportMetaData = false;
-
-		Anchor->ImportOptions = ImportOptions;
-
-		DirectLinkProxy = UDatasmithRuntimeLibrary::GetDirectLinkProxy();
-		if (DirectLinkProxy) {
-			Connect();
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("[CAD Sync Subsystem] DirectLinkProxy is not exist!"));
-		}
-    }*/
 	Connect();
 }
 
@@ -59,6 +37,13 @@ void UCADSyncSubsystem::SpawnAnchor()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Name = TEXT("DatasmithAnchor");
 		Anchor = World->SpawnActor<ADatasmithRuntimeActor>(ADatasmithRuntimeActor::StaticClass(), Transform, SpawnParams);
+
+		FDatasmithRuntimeImportOptions ImportOptions;
+		ImportOptions.BuildHierarchy = EBuildHierarchyMethod::Simplified;
+		ImportOptions.BuildCollisions = ECollisionEnabled::NoCollision;
+		ImportOptions.bImportMetaData = false;
+
+		Anchor->ImportOptions = ImportOptions;
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("[CAD Sync Subsystem] No valid world found to spawn Anchor!"));
