@@ -59,6 +59,28 @@ void UCADSyncSubsystem::InitDirectLinkProxy()
 	}
 }
 
+void UCADSyncSubsystem::ReSync()
+{
+    if (!GetWorld()) return;
+
+    if (SpawnedActorHandler.IsValid())
+    {
+        GetWorld()->RemoveOnActorSpawnedHandler(SpawnedActorHandler);
+        SpawnedActorHandler.Reset();
+    }
+
+    if (Anchor) {
+        Anchor->CloseConnection();
+    }
+    if (DirectLinkProxy) {
+        ;
+        DirectLinkProxy = nullptr;
+    }
+
+    FTimerDelegate ReopenConnection = FTimerDelegate::CreateUObject(this, &UCADSyncSubsystem::Connect);
+    GetWorld()->GetTimerManager().SetTimerForNextTick(ReopenConnection);
+}
+
 bool UCADSyncSubsystem::IsConnected()
 {
 	if (!Anchor || !DirectLinkProxy) return false;

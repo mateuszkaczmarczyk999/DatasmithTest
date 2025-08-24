@@ -12,10 +12,11 @@ class LUMIONDATASMITHTEST_API UCADSyncSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-    // Subsystem lifecycle
-    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-    virtual void Deinitialize() override;
+	// Subsystem lifecycle
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
 	UFUNCTION() void Connect();
+	UFUNCTION() void ReSync();
 	UFUNCTION() bool IsConnected();
 
 private:
