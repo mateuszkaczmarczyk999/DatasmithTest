@@ -17,7 +17,6 @@ public:
 	void Disconnect();
 	bool IsConnected() const;
 	void Flush();
-	class ADatasmithRuntimeActor* GetAnchor() const;
 	
 private:
 	void SpawnAnchor();

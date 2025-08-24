@@ -36,11 +36,6 @@ bool UCADDirectLinkSession::IsConnected() const
 	return Anchor->IsConnected();
 }
 
-ADatasmithRuntimeActor* UCADDirectLinkSession::GetAnchor() const
-{
-	return Anchor;
-}
-
 void UCADDirectLinkSession::Flush()
 {
 	if (Proxy) Proxy = nullptr;

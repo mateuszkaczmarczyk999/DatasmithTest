@@ -3,6 +3,7 @@
 
 #include "CADDatasmithInspect.h"
 #include "DatasmithAssetUserData.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 
 bool CADDatasmithInspect::ReadAndWriteDatasmithMetaData(UObject* Object, TArray<TPair<FName, FString>>& OutputData)
 {
@@ -13,6 +14,19 @@ bool CADDatasmithInspect::ReadAndWriteDatasmithMetaData(UObject* Object, TArray<
 		for (const auto& Entry : UserData->MetaData) OutputData.Emplace(Entry.Key, Entry.Value);
 	}
 	return OutputData.Num() > 0;
+}
+
+FString CADDatasmithInspect::FindValueFromMetaKey(UObject* Object, FName& KeyName)
+{
+	if (!Object) return TEXT("None");
+	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
+	{
+		if (const FString* Value = UserData->MetaData.Find(KeyName))
+		{
+			return *Value;
+		}
+	}
+	return TEXT("None");
 }
 
 bool CADDatasmithInspect::ReadAndWriteDatasmithTags(AActor* Actor, TArray<FName>& OutputData)
@@ -59,4 +73,42 @@ void CADDatasmithInspect::LogActorMetaAndTagsData(AActor* Actor)
 		*Actor->GetName(),
 		*Actor->GetClass()->GetName(),
 		*Loc, *Rot, *Scl);
+}
+
+bool CADDatasmithInspect::ParseInt(const FString& StringValue, int32& OutValue)
+{
+	FString TempString = StringValue;
+	TempString.TrimStartAndEndInline();
+	return LexTryParseString(OutValue, *TempString);
+}
+
+bool CADDatasmithInspect::ParseFloat(const FString& StringValue, float& OutValue)
+{
+	FString TempString = StringValue;
+	TempString.TrimStartAndEndInline();
+	return LexTryParseString(OutValue, *TempString);
+}
+
+bool CADDatasmithInspect::ParseColor(const FString& StringValue, FLinearColor& OutColor)
+{
+	TArray<FString> ColorComponents;
+	ColorComponents.Reserve(3);
+
+	FString TempString = StringValue;
+	TempString.TrimStartAndEndInline();
+	TempString.ParseIntoArray(ColorComponents, TEXT(","), true);
+	if (ColorComponents.Num() != 3) return false;
+
+	float R, G, B;
+	for (FString& Col : ColorComponents) { Col.TrimStartAndEndInline(); }
+
+	if (!ParseFloat(ColorComponents[0], R) ||
+		!ParseFloat(ColorComponents[1], G) ||
+		!ParseFloat(ColorComponents[2], B))
+	{
+		return false;
+	}
+
+	OutColor = FLinearColor(R, G, B, 255.0f);
+	return true;
 }
