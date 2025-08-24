@@ -16,6 +16,7 @@ public:
 	UPROPERTY(meta = (BindWidget)) class UCheckBox* ShadowCheck;
 	UPROPERTY(meta = (BindWidget)) class UCheckBox* ReflectionCheck;
 	UPROPERTY(meta = (BindWidget)) class UButton* DatasmithConnectBtn;
+	UPROPERTY(meta = (BindWidget)) class UButton* DatasmithReSyncBtn;
 	UPROPERTY(meta = (BindWidget)) class UTextBlock* ConnectStatusText;
 
 protected:
@@ -26,6 +27,7 @@ private:
 	UFUNCTION() void OnShadowCheck(bool IsChecked);
 	UFUNCTION() void OnReflectionCheck(bool IsChecked);
 	UFUNCTION() void OnDatasmithConnectClick();
+	UFUNCTION() void OnDatasmithReSyncClick();
 	
 	void SetCVars(const TCHAR* VarName, int32 VarValue);
 

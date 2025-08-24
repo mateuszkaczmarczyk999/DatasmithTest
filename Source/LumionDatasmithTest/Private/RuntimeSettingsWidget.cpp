@@ -21,6 +21,7 @@ void URuntimeSettingsWidget::NativeConstruct()
 	if (ShadowCheck) ShadowCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnShadowCheck);
 	if (ReflectionCheck) ReflectionCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnReflectionCheck);
 	if (DatasmithConnectBtn) DatasmithConnectBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithConnectClick);
+	if (DatasmithReSyncBtn) DatasmithReSyncBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithReSyncClick);
 }
 
 void URuntimeSettingsWidget::SetCVars(const TCHAR* VarName, int32 VarValue)
@@ -89,6 +90,32 @@ void URuntimeSettingsWidget::OnDatasmithConnectClick()
 	if (UGameInstance* GI = GetGameInstance()) {
 		if (UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>()) {
 			CADSync->Connect();
+
+			FTimerHandle T;
+			GetWorld()->GetTimerManager().SetTimer(T, FTimerDelegate::CreateWeakLambda(this, [this, CADSync]()
+				{
+					const bool bConnected = CADSync->IsConnected();
+					UE_LOG(LogTemp, Display, TEXT("[DL] Connected: %s"), bConnected ? TEXT("YES") : TEXT("NO"));
+					if (ConnectStatusText)
+						ConnectStatusText->SetText(FText::FromString(bConnected ? TEXT("Connected") : TEXT("No sources / blocked")));
+				}), 0.5f, false);
+
+			if (ConnectStatusText)
+			{
+				const bool connected = CADSync->IsConnected();
+				ConnectStatusText->SetText(FText::FromString(connected ? TEXT("Connected") : TEXT("Connecting …")));
+			}
+			return;
+		}
+		UE_LOG(LogTemp, Error, TEXT("[RuntimeSettingsWidget] CADSyncSubsystem not found."));
+	}
+}
+
+void URuntimeSettingsWidget::OnDatasmithReSyncClick()
+{
+	if (UGameInstance* GI = GetGameInstance()) {
+		if (UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>()) {
+			CADSync->ReSync();
 
 			FTimerHandle T;
 			GetWorld()->GetTimerManager().SetTimer(T, FTimerDelegate::CreateWeakLambda(this, [this, CADSync]()
