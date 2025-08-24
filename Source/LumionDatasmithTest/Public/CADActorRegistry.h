@@ -19,4 +19,5 @@ public:
 
 private:
 	FDelegateHandle SpawnedActorHandler;
+	UPROPERTY() TObjectPtr<class UCADLightManager> LightManager = nullptr;
 };

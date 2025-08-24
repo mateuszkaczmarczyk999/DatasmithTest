@@ -3,11 +3,13 @@
 
 #include "CADActorRegistry.h"
 #include "CADDatasmithInspect.h"
+#include "CADLightManager.h"
 
 void UCADActorRegistry::Bind()
 {
 	if (UWorld* World = GetWorld())
 	{
+		LightManager = NewObject<UCADLightManager>(this);
 		if (!SpawnedActorHandler.IsValid())
 		{
 			SpawnedActorHandler = World->AddOnActorSpawnedHandler(
@@ -37,6 +39,7 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 		FTimerDelegate::CreateWeakLambda(this, [this, Actor]()
 			{
 				CADDatasmithInspect::LogActorMetaAndTagsData(Actor);
+				LightManager->OnActorSpawned(Actor);
 			}
 		)
 	);

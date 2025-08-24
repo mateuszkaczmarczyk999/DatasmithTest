@@ -16,7 +16,7 @@ bool CADDatasmithInspect::ReadAndWriteDatasmithMetaData(UObject* Object, TArray<
 	return OutputData.Num() > 0;
 }
 
-FString CADDatasmithInspect::FindValueFromMetaKey(UObject* Object, FName& KeyName)
+FString CADDatasmithInspect::FindValueFromMetaKey(UObject* Object, FName KeyName)
 {
 	if (!Object) return TEXT("None");
 	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
@@ -75,21 +75,21 @@ void CADDatasmithInspect::LogActorMetaAndTagsData(AActor* Actor)
 		*Loc, *Rot, *Scl);
 }
 
-bool CADDatasmithInspect::ParseInt(const FString& StringValue, int32& OutValue)
+bool CADDatasmithInspect::ParseInt(const FString StringValue, int32& OutValue)
 {
 	FString TempString = StringValue;
 	TempString.TrimStartAndEndInline();
 	return LexTryParseString(OutValue, *TempString);
 }
 
-bool CADDatasmithInspect::ParseFloat(const FString& StringValue, float& OutValue)
+bool CADDatasmithInspect::ParseFloat(const FString StringValue, float& OutValue)
 {
 	FString TempString = StringValue;
 	TempString.TrimStartAndEndInline();
 	return LexTryParseString(OutValue, *TempString);
 }
 
-bool CADDatasmithInspect::ParseColor(const FString& StringValue, FLinearColor& OutColor)
+bool CADDatasmithInspect::ParseColor(const FString StringValue, FLinearColor& OutColor)
 {
 	TArray<FString> ColorComponents;
 	ColorComponents.Reserve(3);
