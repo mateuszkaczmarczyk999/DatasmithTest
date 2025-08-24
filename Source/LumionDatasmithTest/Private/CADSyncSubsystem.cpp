@@ -12,11 +12,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "DatasmithAssetUserData.h"
 #include "CADDatasmithInspect.h"
+#include "CADActorRegistry.h"
 
 
 void UCADSyncSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
+	ActorRegistry = NewObject<UCADActorRegistry>(this);
 	Connect();
 }
 
@@ -37,14 +39,9 @@ void UCADSyncSubsystem::Connect()
 
 
 	// Should be called from other place
-	if (Opened) {
-		if (UWorld* W = GetWorld())
-		{
-			if (!SpawnedActorHandler.IsValid())
-				SpawnedActorHandler = W->AddOnActorSpawnedHandler(
-					FOnActorSpawned::FDelegate::CreateUObject(this, &UCADSyncSubsystem::OnSpawnedActor));
-			UE_LOG(LogTemp, Display, TEXT("CAD Sync Subsystem] SpawnedActorHandler Started"));
-		}
+	if (Opened)
+	{
+		ActorRegistry->Bind();
 	}
 }
 
@@ -82,15 +79,16 @@ void UCADSyncSubsystem::ReSync()
 {
     if (!GetWorld()) return;
 
-    if (SpawnedActorHandler.IsValid())
+    if (ActorRegistry)
     {
-        GetWorld()->RemoveOnActorSpawnedHandler(SpawnedActorHandler);
-        SpawnedActorHandler.Reset();
+		ActorRegistry->Unbind();
     }
-    if (Anchor) {
+    if (Anchor)
+	{
         Anchor->CloseConnection();
     }
-    if (DirectLinkProxy) {
+    if (DirectLinkProxy)
+	{
         DirectLinkProxy = nullptr;
     }
 
@@ -104,30 +102,18 @@ bool UCADSyncSubsystem::IsConnected()
 	return Anchor->IsConnected();
 }
 
-void UCADSyncSubsystem::OnSpawnedActor(AActor* Actor)
-{
-	if (!Actor) return;
-
-    GetWorld()->GetTimerManager().SetTimerForNextTick(
-        FTimerDelegate::CreateWeakLambda(this, [this, Actor]()
-            {
-				CADDatasmithInspect::LogActorMetaAndTagsData(Actor);
-            }
-		)
-    );
-}
-
 void UCADSyncSubsystem::Deinitialize()
 {
-	if (SpawnedActorHandler.IsValid())
+	if (ActorRegistry)
 	{
-		GetWorld()->RemoveOnActorSpawnedHandler(SpawnedActorHandler);
-		SpawnedActorHandler.Reset();
+		ActorRegistry->Unbind();
 	}
-	if (DirectLinkProxy) {
+	if (DirectLinkProxy)
+	{
 		DirectLinkProxy = nullptr;
 	}
-    if (Anchor) {
+    if (Anchor)
+	{
 		Anchor->CloseConnection();
 		Anchor->Destroy();
 		Anchor = nullptr;

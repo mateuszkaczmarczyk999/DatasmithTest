@@ -22,10 +22,9 @@ public:
 private:
 	void SpawnAnchor();
 	void InitDirectLinkProxy();
-	UPROPERTY() TObjectPtr<class ADatasmithRuntimeActor> Anchor = nullptr;
-	UPROPERTY() TObjectPtr<class UDirectLinkProxy> DirectLinkProxy = nullptr;
 	const int32 SourceIdx = 0;
 
-	FDelegateHandle SpawnedActorHandler;
-	void OnSpawnedActor(AActor* Actor);
+	UPROPERTY() TObjectPtr<class ADatasmithRuntimeActor> Anchor = nullptr;
+	UPROPERTY() TObjectPtr<class UDirectLinkProxy> DirectLinkProxy = nullptr;
+	UPROPERTY() TObjectPtr<class UCADActorRegistry> ActorRegistry = nullptr;
 };
