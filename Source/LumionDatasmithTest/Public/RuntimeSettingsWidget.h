@@ -30,8 +30,13 @@ private:
 	UFUNCTION() void OnDatasmithReSyncClick();
 	
 	void SetCVars(const TCHAR* VarName, int32 VarValue);
-
 	void ToggleRayTracing(bool IsEnabled);
 	void ToggleShadows(bool IsEnabled);
-	void ToggleReflections(bool IsEnabled);	
+	void ToggleReflections(bool IsEnabled);
+
+	class UCADSyncSubsystem* TryGetCADSyncSystem();
+	void SetConnectionStatusText(const TCHAR* Text);
+	void CheckConnectionStatus();
+	const float PostConnectionDelay = 0.5f;
+	FTimerHandle ConnectionStatusTimerHandle;
 };

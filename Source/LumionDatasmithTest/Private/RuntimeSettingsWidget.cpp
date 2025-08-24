@@ -70,6 +70,12 @@ void URuntimeSettingsWidget::ToggleReflections(bool IsChecked)
 	SetCVars(TEXT("r.Lumen.Reflections.HardwareRayTracing"), IsChecked ? 1 : 0);
 }
 
+void URuntimeSettingsWidget::SetConnectionStatusText(const TCHAR* Text)
+{
+	if (ConnectStatusText) ConnectStatusText->SetText(FText::FromString(Text));
+	else UE_LOG(LogTemp, Warning, TEXT("ConnectStatusText is not set!"));
+}
+
 void URuntimeSettingsWidget::OnRayTracingCheck(bool IsChecked)
 {
 	ToggleRayTracing(IsChecked);
@@ -85,54 +91,68 @@ void URuntimeSettingsWidget::OnReflectionCheck(bool IsChecked)
 	ToggleReflections(IsChecked);
 }
 
+
+UCADSyncSubsystem* URuntimeSettingsWidget::TryGetCADSyncSystem()
+{
+	UWorld* World = GetWorld();
+	if (!World) return nullptr;
+
+	UGameInstance* GI = GetGameInstance();
+	if (!GI)
+	{
+		SetConnectionStatusText(TEXT("Game Instance missing..."));
+		return nullptr;
+	}
+
+	UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>();
+	if (!CADSync)
+	{
+		SetConnectionStatusText(TEXT("CAD Sync Subsystem missing..."));
+		return nullptr;
+	}
+	return CADSync;
+}
+
+void URuntimeSettingsWidget::CheckConnectionStatus()
+{
+	const auto CADSync = TryGetCADSyncSystem();
+	if (!CADSync) return;
+
+	const bool bConnected = CADSync->IsConnected();
+	SetConnectionStatusText(bConnected ? TEXT("Connected") : TEXT("No sources."));
+}
+
 void URuntimeSettingsWidget::OnDatasmithConnectClick()
 {
-	if (UGameInstance* GI = GetGameInstance()) {
-		if (UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>()) {
-			CADSync->Connect();
+	const auto CADSync = TryGetCADSyncSystem();
+	if (!CADSync) return;
 
-			FTimerHandle T;
-			GetWorld()->GetTimerManager().SetTimer(T, FTimerDelegate::CreateWeakLambda(this, [this, CADSync]()
-				{
-					const bool bConnected = CADSync->IsConnected();
-					UE_LOG(LogTemp, Display, TEXT("[DL] Connected: %s"), bConnected ? TEXT("YES") : TEXT("NO"));
-					if (ConnectStatusText)
-						ConnectStatusText->SetText(FText::FromString(bConnected ? TEXT("Connected") : TEXT("No sources / blocked")));
-				}), 0.5f, false);
-
-			if (ConnectStatusText)
-			{
-				const bool connected = CADSync->IsConnected();
-				ConnectStatusText->SetText(FText::FromString(connected ? TEXT("Connected") : TEXT("Connecting …")));
-			}
-			return;
-		}
-		UE_LOG(LogTemp, Error, TEXT("[RuntimeSettingsWidget] CADSyncSubsystem not found."));
+	if (CADSync->IsConnected())
+	{
+		SetConnectionStatusText(TEXT("Already connected."));
+		return;
 	}
+	SetConnectionStatusText(TEXT("Connecting …"));
+	CADSync->Connect();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		ConnectionStatusTimerHandle,
+		FTimerDelegate::CreateUObject(this, &URuntimeSettingsWidget::CheckConnectionStatus),
+		PostConnectionDelay,
+		false);
 }
 
 void URuntimeSettingsWidget::OnDatasmithReSyncClick()
 {
-	if (UGameInstance* GI = GetGameInstance()) {
-		if (UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>()) {
-			CADSync->ReSync();
+	const auto CADSync = TryGetCADSyncSystem();
+	if (!CADSync) return;
 
-			FTimerHandle T;
-			GetWorld()->GetTimerManager().SetTimer(T, FTimerDelegate::CreateWeakLambda(this, [this, CADSync]()
-				{
-					const bool bConnected = CADSync->IsConnected();
-					UE_LOG(LogTemp, Display, TEXT("[DL] Connected: %s"), bConnected ? TEXT("YES") : TEXT("NO"));
-					if (ConnectStatusText)
-						ConnectStatusText->SetText(FText::FromString(bConnected ? TEXT("Connected") : TEXT("No sources / blocked")));
-				}), 0.5f, false);
+	SetConnectionStatusText(TEXT("Resynchronization …"));
+	CADSync->ReSync();
 
-			if (ConnectStatusText)
-			{
-				const bool connected = CADSync->IsConnected();
-				ConnectStatusText->SetText(FText::FromString(connected ? TEXT("Connected") : TEXT("Connecting …")));
-			}
-			return;
-		}
-		UE_LOG(LogTemp, Error, TEXT("[RuntimeSettingsWidget] CADSyncSubsystem not found."));
-	}
+	GetWorld()->GetTimerManager().SetTimer(
+		ConnectionStatusTimerHandle,
+		FTimerDelegate::CreateUObject(this, &URuntimeSettingsWidget::CheckConnectionStatus),
+		PostConnectionDelay,
+		false);
 }
