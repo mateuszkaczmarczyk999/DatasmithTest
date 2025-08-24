@@ -20,11 +20,6 @@ public:
 	UFUNCTION() bool IsConnected();
 
 private:
-	void SpawnAnchor();
-	void InitDirectLinkProxy();
-	const int32 SourceIdx = 0;
-
-	UPROPERTY() TObjectPtr<class ADatasmithRuntimeActor> Anchor = nullptr;
-	UPROPERTY() TObjectPtr<class UDirectLinkProxy> DirectLinkProxy = nullptr;
 	UPROPERTY() TObjectPtr<class UCADActorRegistry> ActorRegistry = nullptr;
+	UPROPERTY() TObjectPtr<class UCADDirectLinkSession> DirectLinkSession = nullptr;
 };
