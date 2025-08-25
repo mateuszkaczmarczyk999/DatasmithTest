@@ -14,12 +14,18 @@ void UCADLightManager::OnActorSpawned(AActor* Proxy)
 {
 	if (!Proxy) return;
 
-	if (!CADDatasmithInspect::HasMetaKey(Proxy, TEXT("UE_LightType"))) return;
-
 	const FName LigthProxyChecked(TEXT("Rhino_Light_Proxy_Exist"));
 	if (Proxy->ActorHasTag(LigthProxyChecked)) return;
 
-	LightDescription Description = ReadDescriptionFromProxy(Proxy);
+
+	TMap<FName, FString> MetaData;
+	if (!CADDatasmithInspect::GetMetaSnapshotMap(Proxy, MetaData)) return;
+
+
+	if (!MetaData.Contains(TEXT("UE_LightType"))) return;
+	LightDescription Description = ReadDescriptionFromProxy(MetaData);
+
+
 	if (Description.TypeId == 0 || Description.TypeId == 1)
 	{
 		AActor* Light = SpawnLight(Proxy, Description);
@@ -32,27 +38,26 @@ void UCADLightManager::OnActorSpawned(AActor* Proxy)
 	}
 }
 
-LightDescription UCADLightManager::ReadDescriptionFromProxy(AActor* Proxy)
+LightDescription UCADLightManager::ReadDescriptionFromProxy(const TMap<FName, FString>& MetaData)
 {
 	LightDescription Description;
 
 	int32 LightTypeId = -1;
-	const FString LightTypeHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightType"));
+	const FString LightTypeHash = CADDatasmithInspect::FindValueFromMetaKey(MetaData, TEXT("UE_LightType"));
 	bool LTypeValid = CADDatasmithInspect::ParseInt(LightTypeHash, LightTypeId);
 
 	FLinearColor LightColor = FLinearColor::White;
-	const FString LightColorHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightColor"));
+	const FString LightColorHash = CADDatasmithInspect::FindValueFromMetaKey(MetaData, TEXT("UE_LightColor"));
 	bool lColorValid = CADDatasmithInspect::ParseColor(LightColorHash, LightColor);
 
 	float LightIntensity = 1000.0f;
-	const FString LightIntensityHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightIntensity"));
+	const FString LightIntensityHash = CADDatasmithInspect::FindValueFromMetaKey(MetaData, TEXT("UE_LightIntensity"));
 	bool lIntensityValid = CADDatasmithInspect::ParseFloat(LightIntensityHash, LightIntensity);
 
 	TArray<float> LightSize = { 100.0f, 100.0f };
-	const FString LightSizeHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightSize"));
+	const FString LightSizeHash = CADDatasmithInspect::FindValueFromMetaKey(MetaData, TEXT("UE_LightSize"));
 	bool lSizeValid = CADDatasmithInspect::ParseVector(LightSizeHash, LightSize);
 
-	Description.Transform = Proxy->GetTransform();
 	Description.TypeId = LightTypeId;
 	Description.Color = LightColor;
 	Description.Intensity = LightIntensity;
@@ -60,7 +65,7 @@ LightDescription UCADLightManager::ReadDescriptionFromProxy(AActor* Proxy)
 
 	if (!LTypeValid || !lColorValid || !lIntensityValid || !lSizeValid)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[CAD Light Manager] Invalid light description for actor %s"), *Proxy->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("[CAD Light Manager] Invalid light description for actor %s"), *Proxy->GetName());
 		Description.TypeId = -1;
 	}
 
@@ -73,7 +78,7 @@ AActor* UCADLightManager::SpawnLight(AActor* Proxy, const LightDescription& Desc
 
 	if (Description.TypeId == 0) // Point Light
 	{
-		APointLight* A = GetWorld()->SpawnActor<APointLight>(APointLight::StaticClass(), Description.Transform);
+		APointLight* A = GetWorld()->SpawnActor<APointLight>(APointLight::StaticClass(), Proxy->GetTransform());
 		TObjectPtr<UPointLightComponent> Component = A->PointLightComponent;
 		Component->SetIntensityUnits(ELightUnits::Lumens);
 		Component->SetIntensity(Description.Intensity);
@@ -83,7 +88,7 @@ AActor* UCADLightManager::SpawnLight(AActor* Proxy, const LightDescription& Desc
 	}
 	else if (Description.TypeId == 1) // Rect Light
 	{
-		ARectLight* A = GetWorld()->SpawnActor<ARectLight>(ARectLight::StaticClass(), Description.Transform);
+		ARectLight* A = GetWorld()->SpawnActor<ARectLight>(ARectLight::StaticClass(), Proxy->GetTransform());
 		TObjectPtr<URectLightComponent> Component = A->RectLightComponent;
 		Component->SetIntensityUnits(ELightUnits::Lumens);
 		Component->SetIntensity(Description.Intensity);

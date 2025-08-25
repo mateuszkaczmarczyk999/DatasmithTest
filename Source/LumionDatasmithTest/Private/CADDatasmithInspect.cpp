@@ -5,6 +5,21 @@
 #include "DatasmithAssetUserData.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
 
+bool CADDatasmithInspect::GetMetaSnapshotMap(UObject* Object, TMap<FName, FString>& OutputData)
+{
+	if (!Object) return false;
+
+	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
+	{
+		OutputData.Reserve(UserData->MetaData.Num());
+		for (const TPair<FName, FString>& Entry : UserData->MetaData)
+		{
+			OutputData.Add(Entry.Key, Entry.Value);
+		}
+	}
+	return OutputData.Num() > 0;
+}
+
 bool CADDatasmithInspect::ReadAndWriteDatasmithMetaData(UObject* Object, TArray<TPair<FName, FString>>& OutputData)
 {
 	if (!Object) return false;
@@ -27,17 +42,9 @@ bool CADDatasmithInspect::HasMetaKey(UObject* Object, FName KeyName)
 	return false;
 }
 
-FString CADDatasmithInspect::FindValueFromMetaKey(UObject* Object, FName KeyName)
+FString CADDatasmithInspect::FindValueFromMetaKey(const TMap<FName, FString>& MetaData, FName KeyName)
 {
-	if (!Object) return TEXT("None");
-
-	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
-	{
-		if (const FString* Value = UserData->MetaData.Find(KeyName))
-		{
-			return *Value;
-		}
-	}
+	if (const FString* Value = MetaData.Find(KeyName)) return *Value;
 	return TEXT("None");
 }
 

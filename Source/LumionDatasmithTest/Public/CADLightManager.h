@@ -8,7 +8,6 @@
 
 
 struct LightDescription {
-	FTransform Transform;
 	int32 TypeId;
 	FLinearColor Color;
 	float Intensity;
@@ -24,7 +23,7 @@ public:
 	void OnActorSpawned(AActor* Proxy);
 
 private:
-	LightDescription ReadDescriptionFromProxy(AActor* Proxy);
+	LightDescription ReadDescriptionFromProxy(const TMap<FName, FString>& MetaData);
 	AActor* SpawnLight(AActor* Proxy, const LightDescription& Description);
 	void HideProxyMesh(AActor* Proxy);
 };

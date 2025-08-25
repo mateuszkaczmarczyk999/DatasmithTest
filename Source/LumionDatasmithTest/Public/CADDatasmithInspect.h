@@ -5,9 +5,10 @@
 
 namespace CADDatasmithInspect
 {
+	bool GetMetaSnapshotMap(UObject* Object, TMap<FName, FString>& OutputData);
 	bool ReadAndWriteDatasmithMetaData(UObject* Object, TArray<TPair<FName, FString>>& Out);
 	bool HasMetaKey(UObject* Object, FName KeyName);
-	FString FindValueFromMetaKey(UObject* Object, FName KeyName);
+	FString FindValueFromMetaKey(const TMap<FName, FString>& MetaData, FName KeyName);
 	bool ReadAndWriteDatasmithTags(AActor* Actor, TArray<FName>& Out);
 	void LogActorMetaAndTagsData(AActor* Actor);
 	bool ParseInt(const FString StringValue, int32& OutValue);
