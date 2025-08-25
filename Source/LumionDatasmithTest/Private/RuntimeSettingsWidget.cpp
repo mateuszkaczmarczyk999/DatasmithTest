@@ -17,8 +17,17 @@ void URuntimeSettingsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (RaytracingCheck) RaytracingCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnRayTracingCheck);
-	if (ShadowCheck) ShadowCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnShadowCheck);
+	if (RaytracingCheck)
+	{
+		RaytracingCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnRayTracingCheck);
+		RaytracingCheck->SetCheckedState(ECheckBoxState::Checked);
+	}
+	if (ShadowCheck)
+	{
+		ShadowCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnShadowCheck);
+		ShadowCheck->SetCheckedState(ECheckBoxState::Checked);
+	}
+	if (DatasmithLightsUpdateBtn) DatasmithLightsUpdateBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithLightsUpdateClick);
 	if (DatasmithConnectBtn) DatasmithConnectBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithConnectClick);
 	if (DatasmithReSyncBtn) DatasmithReSyncBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithReSyncClick);
 }
@@ -38,7 +47,22 @@ void URuntimeSettingsWidget::SetCVars(const TCHAR* VarName, int32 VarValue)
 
 void URuntimeSettingsWidget::ToggleRayTracing(bool IsChecked)
 {
-	SetCVars(TEXT("r.RayTracing.Enable"), IsChecked ? 1 : 0);
+	if (IsChecked)
+	{
+		SetCVars(TEXT("r.RayTracing.Enable"),1);
+		SetCVars(TEXT("r.Lumen.DiffuseIndirect.Allow"),1);
+		SetCVars(TEXT("r.Lumen.Reflections.Allow"),1);
+		SetCVars(TEXT("r.VolumetricFog"),1);
+		SetCVars(TEXT("r.SSGI"),1);
+	}
+	else
+	{
+		SetCVars(TEXT("r.RayTracing.Enable"),0);
+		SetCVars(TEXT("r.Lumen.DiffuseIndirect.Allow"),0);
+		SetCVars(TEXT("r.Lumen.Reflections.Allow"),0);
+		SetCVars(TEXT("r.VolumetricFog"),0);
+		SetCVars(TEXT("r.SSGI"),0);
+	}
 }
 
 void URuntimeSettingsWidget::ToggleShadows(bool IsChecked)
@@ -87,14 +111,14 @@ UCADSyncSubsystem* URuntimeSettingsWidget::TryGetCADSyncSystem()
 	UGameInstance* GI = GetGameInstance();
 	if (!GI)
 	{
-		SetConnectionStatusText(TEXT("Game Instance missing..."));
+		SetConnectionStatusText(TEXT("Game Instance missing ..."));
 		return nullptr;
 	}
 
 	UCADSyncSubsystem* CADSync = GI->GetSubsystem<UCADSyncSubsystem>();
 	if (!CADSync)
 	{
-		SetConnectionStatusText(TEXT("CAD Sync Subsystem missing..."));
+		SetConnectionStatusText(TEXT("CAD Sync Subsystem missing ..."));
 		return nullptr;
 	}
 	return CADSync;
@@ -106,7 +130,7 @@ void URuntimeSettingsWidget::CheckConnectionStatus()
 	if (!CADSync) return;
 
 	const bool bConnected = CADSync->IsConnected();
-	SetConnectionStatusText(bConnected ? TEXT("Connected") : TEXT("No sources."));
+	SetConnectionStatusText(bConnected ? TEXT("Connected.") : TEXT("No sources."));
 }
 
 void URuntimeSettingsWidget::OnDatasmithConnectClick()
@@ -119,7 +143,7 @@ void URuntimeSettingsWidget::OnDatasmithConnectClick()
 		SetConnectionStatusText(TEXT("Already connected."));
 		return;
 	}
-	SetConnectionStatusText(TEXT("Connecting �"));
+	SetConnectionStatusText(TEXT("Connecting ..."));
 	CADSync->Connect();
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -134,7 +158,7 @@ void URuntimeSettingsWidget::OnDatasmithReSyncClick()
 	const auto CADSync = TryGetCADSyncSystem();
 	if (!CADSync) return;
 
-	SetConnectionStatusText(TEXT("Resynchronization �"));
+	SetConnectionStatusText(TEXT("Resynchronization ..."));
 	CADSync->ReSync();
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -142,4 +166,14 @@ void URuntimeSettingsWidget::OnDatasmithReSyncClick()
 		FTimerDelegate::CreateUObject(this, &URuntimeSettingsWidget::CheckConnectionStatus),
 		PostConnectionDelay,
 		false);
+}
+
+void URuntimeSettingsWidget::OnDatasmithLightsUpdateClick()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnDatasmithLightsUpdateClick!"))
+	const auto CADSync = TryGetCADSyncSystem();
+	if (!CADSync) return;
+	
+	CADSync->UpdateLigths();
+	SetConnectionStatusText(TEXT("Lights updated."));
 }
