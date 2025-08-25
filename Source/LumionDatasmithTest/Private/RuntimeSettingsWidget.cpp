@@ -19,7 +19,6 @@ void URuntimeSettingsWidget::NativeConstruct()
 
 	if (RaytracingCheck) RaytracingCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnRayTracingCheck);
 	if (ShadowCheck) ShadowCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnShadowCheck);
-	if (ReflectionCheck) ReflectionCheck->OnCheckStateChanged.AddDynamic(this, &URuntimeSettingsWidget::OnReflectionCheck);
 	if (DatasmithConnectBtn) DatasmithConnectBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithConnectClick);
 	if (DatasmithReSyncBtn) DatasmithReSyncBtn->OnClicked.AddDynamic(this, &URuntimeSettingsWidget::OnDatasmithReSyncClick);
 }
@@ -39,7 +38,7 @@ void URuntimeSettingsWidget::SetCVars(const TCHAR* VarName, int32 VarValue)
 
 void URuntimeSettingsWidget::ToggleRayTracing(bool IsChecked)
 {
-	SetCVars(TEXT("r.RayTracing"), IsChecked ? 1 : 0);
+	SetCVars(TEXT("r.RayTracing.Enable"), IsChecked ? 1 : 0);
 }
 
 void URuntimeSettingsWidget::ToggleShadows(bool IsChecked)
@@ -64,12 +63,6 @@ void URuntimeSettingsWidget::ToggleShadows(bool IsChecked)
 	}
 }
 
-void URuntimeSettingsWidget::ToggleReflections(bool IsChecked)
-{
-	SetCVars(TEXT("r.Lumen.Reflections.ScreenTraces"), IsChecked ? 1 : 0);
-	SetCVars(TEXT("r.Lumen.Reflections.HardwareRayTracing"), IsChecked ? 1 : 0);
-}
-
 void URuntimeSettingsWidget::SetConnectionStatusText(const TCHAR* Text)
 {
 	if (ConnectStatusText) ConnectStatusText->SetText(FText::FromString(Text));
@@ -85,12 +78,6 @@ void URuntimeSettingsWidget::OnShadowCheck(bool IsChecked)
 {
 	ToggleShadows(IsChecked);
 }
-
-void URuntimeSettingsWidget::OnReflectionCheck(bool IsChecked)
-{
-	ToggleReflections(IsChecked);
-}
-
 
 UCADSyncSubsystem* URuntimeSettingsWidget::TryGetCADSyncSystem()
 {
@@ -132,7 +119,7 @@ void URuntimeSettingsWidget::OnDatasmithConnectClick()
 		SetConnectionStatusText(TEXT("Already connected."));
 		return;
 	}
-	SetConnectionStatusText(TEXT("Connecting …"));
+	SetConnectionStatusText(TEXT("Connecting ï¿½"));
 	CADSync->Connect();
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -147,7 +134,7 @@ void URuntimeSettingsWidget::OnDatasmithReSyncClick()
 	const auto CADSync = TryGetCADSyncSystem();
 	if (!CADSync) return;
 
-	SetConnectionStatusText(TEXT("Resynchronization …"));
+	SetConnectionStatusText(TEXT("Resynchronization ï¿½"));
 	CADSync->ReSync();
 
 	GetWorld()->GetTimerManager().SetTimer(

@@ -14,7 +14,6 @@ class LUMIONDATASMITHTEST_API URuntimeSettingsWidget : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget)) class UCheckBox* RaytracingCheck;
 	UPROPERTY(meta = (BindWidget)) class UCheckBox* ShadowCheck;
-	UPROPERTY(meta = (BindWidget)) class UCheckBox* ReflectionCheck;
 	UPROPERTY(meta = (BindWidget)) class UButton* DatasmithConnectBtn;
 	UPROPERTY(meta = (BindWidget)) class UButton* DatasmithReSyncBtn;
 	UPROPERTY(meta = (BindWidget)) class UTextBlock* ConnectStatusText;
@@ -25,14 +24,12 @@ protected:
 private:
 	UFUNCTION() void OnRayTracingCheck(bool IsChecked);
 	UFUNCTION() void OnShadowCheck(bool IsChecked);
-	UFUNCTION() void OnReflectionCheck(bool IsChecked);
 	UFUNCTION() void OnDatasmithConnectClick();
 	UFUNCTION() void OnDatasmithReSyncClick();
 	
 	void SetCVars(const TCHAR* VarName, int32 VarValue);
 	void ToggleRayTracing(bool IsEnabled);
 	void ToggleShadows(bool IsEnabled);
-	void ToggleReflections(bool IsEnabled);
 
 	class UCADSyncSubsystem* TryGetCADSyncSystem();
 	void SetConnectionStatusText(const TCHAR* Text);
