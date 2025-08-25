@@ -19,8 +19,11 @@ public:
 	void OnSpawnedActor(AActor* Actor);
 	void OnWorldTick(UWorld* World, ELevelTick TickType, float DeltaSeconds);
 	void CheckActorsForLightData();
+	void DestoyActors();
 
 private:
+	static const FName DatasmithGeometry;
+	
 	FDelegateHandle SpawnedActorHandler;
 	FDelegateHandle WorldTickHandler;
 	UPROPERTY() TObjectPtr<class UCADLightManager> LightManager = nullptr;

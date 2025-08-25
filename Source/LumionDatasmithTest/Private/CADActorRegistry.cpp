@@ -7,6 +7,9 @@
 #include "EngineUtils.h"
 #include "Engine/World.h"
 #include "Engine/StaticMeshActor.h"
+#include "Kismet/GameplayStatics.h"
+
+const FName UCADActorRegistry::DatasmithGeometry(TEXT("Datasmith_Geometry"));
 
 void UCADActorRegistry::Bind()
 {
@@ -60,6 +63,7 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 			{
 				CADDatasmithInspect::LogActorMetaAndTagsData(Actor);
 				LightManager->ProcessLightProxy(Actor);
+				Actor->Tags.Add(DatasmithGeometry);
 			}
 		)
 	);
@@ -68,12 +72,34 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 void UCADActorRegistry::CheckActorsForLightData()
 {
 	if (!LightManager) return;
+	
 	if (UWorld* World = GetWorld())
 	{
-		for (AStaticMeshActor* Actor : TActorRange<AStaticMeshActor>(World))
+		TArray<AActor*> Matches;
+		UGameplayStatics::GetAllActorsWithTag(World, DatasmithGeometry, Matches);
+		
+		for (auto* Actor : Matches)
 		{
+			if (!IsValid(Actor)) continue;
+			
+			CADDatasmithInspect::LogActorMetaAndTagsData(Actor);
 			LightManager->ProcessLightProxy(Actor);
 		}
 	}
 }
 
+void UCADActorRegistry::DestoyActors()
+{
+	if (!LightManager) return;
+	
+	if (UWorld* World = GetWorld())
+	{
+		TArray<AActor*> Matches;
+		UGameplayStatics::GetAllActorsWithTag(World, DatasmithGeometry, Matches);
+		
+		for (auto* Actor : Matches)
+		{
+			if (IsValid(Actor)) Actor->Destroy();
+		}
+	}
+}

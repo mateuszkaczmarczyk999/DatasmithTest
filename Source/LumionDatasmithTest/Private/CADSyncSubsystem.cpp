@@ -24,7 +24,11 @@ void UCADSyncSubsystem::ReSync()
 {
     if (!GetWorld()) return;
 
-    if (ActorRegistry) ActorRegistry->Unbind();
+    if (ActorRegistry)
+    {
+    	ActorRegistry->DestoyActors();
+	    ActorRegistry->Unbind();
+    }
 	if (DirectLinkSession) DirectLinkSession->Disconnect();
 
     FTimerDelegate ReopenConnection = FTimerDelegate::CreateUObject(this, &UCADSyncSubsystem::Connect);
