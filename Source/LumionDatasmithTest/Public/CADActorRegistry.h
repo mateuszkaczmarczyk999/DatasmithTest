@@ -18,6 +18,7 @@ public:
 	void Unbind();
 	void OnSpawnedActor(AActor* Actor);
 	void OnWorldTick(UWorld* World, ELevelTick TickType, float DeltaSeconds);
+	void CheckActorsForLightData();
 
 private:
 	FDelegateHandle SpawnedActorHandler;

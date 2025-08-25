@@ -4,7 +4,9 @@
 #include "CADActorRegistry.h"
 #include "CADDatasmithInspect.h"
 #include "CADLightManager.h"
+#include "EngineUtils.h"
 #include "Engine/World.h"
+#include "Engine/StaticMeshActor.h"
 
 void UCADActorRegistry::Bind()
 {
@@ -57,9 +59,21 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 		FTimerDelegate::CreateWeakLambda(this, [this, Actor]()
 			{
 				CADDatasmithInspect::LogActorMetaAndTagsData(Actor);
-				LightManager->OnActorSpawned(Actor);
+				LightManager->ProcessLightProxy(Actor);
 			}
 		)
 	);
+}
+
+void UCADActorRegistry::CheckActorsForLightData()
+{
+	if (!LightManager) return;
+	if (UWorld* World = GetWorld())
+	{
+		for (AStaticMeshActor* Actor : TActorRange<AStaticMeshActor>(World))
+		{
+			LightManager->ProcessLightProxy(Actor);
+		}
+	}
 }
 

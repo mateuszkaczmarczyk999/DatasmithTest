@@ -12,7 +12,7 @@
 const FName UCADLightManager::LightProxyReady(TEXT("Light_Proxy_Ready"));
 const FName UCADLightManager::LightProxyParsing(TEXT("Light_Proxy_Parsing"));
 
-void UCADLightManager::OnActorSpawned(AActor* Proxy)
+void UCADLightManager::ProcessLightProxy(AActor* Proxy)
 {
 	if (!Proxy) return;
 	

@@ -37,6 +37,13 @@ bool UCADSyncSubsystem::IsConnected()
 	return DirectLinkSession->IsConnected();
 }
 
+void UCADSyncSubsystem::UpdateLigths()
+{
+	if (!GetWorld()) return;
+	if (ActorRegistry) ActorRegistry->CheckActorsForLightData();
+}
+
+
 void UCADSyncSubsystem::Deinitialize()
 {
 	if (ActorRegistry) ActorRegistry->Unbind();

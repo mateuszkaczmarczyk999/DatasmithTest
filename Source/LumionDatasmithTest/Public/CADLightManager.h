@@ -20,7 +20,7 @@ class LUMIONDATASMITHTEST_API UCADLightManager : public UObject
 	GENERATED_BODY()
 	
 public:
-	void OnActorSpawned(AActor* Proxy);
+	void ProcessLightProxy(AActor* Proxy);
 	void OnTick(float DT);
 
 private:
