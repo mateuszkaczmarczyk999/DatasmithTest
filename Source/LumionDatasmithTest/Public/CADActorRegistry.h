@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Tickable.h"
 #include "UObject/NoExportTypes.h"
 #include "CADActorRegistry.generated.h"
 
@@ -16,9 +17,11 @@ public:
 	void Bind();
 	void Unbind();
 	void OnSpawnedActor(AActor* Actor);
+	void OnWorldTick(UWorld* World, ELevelTick TickType, float DeltaSeconds);
 	void OnSceneTransformChanged(USceneComponent* SceneComponent, EUpdateTransformFlags Flags, ETeleportType Teleport);
 
 private:
 	FDelegateHandle SpawnedActorHandler;
+	FDelegateHandle WorldTickHandler;
 	UPROPERTY() TObjectPtr<class UCADLightManager> LightManager = nullptr;
 };

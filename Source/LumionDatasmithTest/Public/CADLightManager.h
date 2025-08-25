@@ -21,8 +21,13 @@ class LUMIONDATASMITHTEST_API UCADLightManager : public UObject
 	
 public:
 	void OnActorSpawned(AActor* Proxy);
+	void OnTick(float DT);
 
 private:
+	static const FName LightProxyReady;
+	static const FName LightProxyParsing;
+	
+	TQueue<TPair<TWeakObjectPtr<AActor>, LightDescription>, EQueueMode::Mpsc> LightDescriptionQueue;
 	LightDescription ReadDescriptionFromProxy(const TMap<FName, FString>& MetaData);
 	AActor* SpawnLight(AActor* Proxy, const LightDescription& Description);
 	void HideProxyMesh(AActor* Proxy);

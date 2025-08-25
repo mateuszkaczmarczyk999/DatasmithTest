@@ -9,32 +9,65 @@
 #include "Math/UnrealMathUtility.h"
 #include "CADDatasmithInspect.h"
 
+const FName UCADLightManager::LightProxyReady(TEXT("Light_Proxy_Ready"));
+const FName UCADLightManager::LightProxyParsing(TEXT("Light_Proxy_Parsing"));
 
 void UCADLightManager::OnActorSpawned(AActor* Proxy)
 {
 	if (!Proxy) return;
-
-	const FName LigthProxyChecked(TEXT("Rhino_Light_Proxy_Exist"));
-	if (Proxy->ActorHasTag(LigthProxyChecked)) return;
-
-
+	
+	if (Proxy->ActorHasTag(LightProxyReady) || Proxy->ActorHasTag(LightProxyParsing)) return;
+	
 	TMap<FName, FString> MetaData;
 	if (!CADDatasmithInspect::GetMetaSnapshotMap(Proxy, MetaData)) return;
+	Proxy->Tags.AddUnique(LightProxyParsing);
 
-
-	if (!MetaData.Contains(TEXT("UE_LightType"))) return;
-	LightDescription Description = ReadDescriptionFromProxy(MetaData);
-
-
-	if (Description.TypeId == 0 || Description.TypeId == 1)
+	TWeakObjectPtr<AActor> WeakProxy = Proxy;
+	Async(EAsyncExecution::ThreadPool, [this, WeakProxy, MetaData = MoveTemp(MetaData)]()
 	{
-		AActor* Light = SpawnLight(Proxy, Description);
-		if (!Light) return;
+		LightDescription Description = ReadDescriptionFromProxy(MetaData);
+		LightDescriptionQueue.Enqueue(TPair<TWeakObjectPtr<AActor>, LightDescription>(WeakProxy, MoveTemp(Description)));
+	});
+}
+
+void UCADLightManager::OnTick(float DT)
+{
+	const int32 TickApplyCap = 100;
+	int32 Applied = 0;
+	
+	TPair<TWeakObjectPtr<AActor>, LightDescription> ReadyDescription;
+	while (Applied < TickApplyCap && LightDescriptionQueue.Dequeue(ReadyDescription))
+	{
+		AActor* Proxy = ReadyDescription.Key.Get();
+		if (!Proxy) continue;
+		
+		if (Proxy->ActorHasTag(FName(LightProxyReady)))
+		{
+			Proxy->Tags.Remove(LightProxyParsing);
+			continue;
+		}
+
+		if (ReadyDescription.Value.TypeId < 0)
+		{
+			Proxy->Tags.Remove(LightProxyParsing);
+			continue;
+		}
+
+		AActor* Light = SpawnLight(Proxy, ReadyDescription.Value);
+		if (!Light)
+		{
+			Proxy->Tags.Remove(LightProxyParsing);
+			continue;
+		}
 
 		USceneComponent* Root = Proxy->GetRootComponent();
 		Light->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
-		Proxy->Tags.AddUnique(LigthProxyChecked);
+		
+		Proxy->Tags.Remove(LightProxyParsing);
+		Proxy->Tags.AddUnique(LightProxyReady);
 		HideProxyMesh(Proxy);
+		
+		Applied++;
 	}
 }
 
@@ -65,7 +98,6 @@ LightDescription UCADLightManager::ReadDescriptionFromProxy(const TMap<FName, FS
 
 	if (!LTypeValid || !lColorValid || !lIntensityValid || !lSizeValid)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("[CAD Light Manager] Invalid light description for actor %s"), *Proxy->GetName());
 		Description.TypeId = -1;
 	}
 
