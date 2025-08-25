@@ -46,12 +46,17 @@ LightDescription UCADLightManager::ReadDescriptionFromProxy(AActor* Proxy)
 	const FString LightIntensityHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightIntensity"));
 	bool lIntensityValid = CADDatasmithInspect::ParseFloat(LightIntensityHash, LightIntensity);
 
+	TArray<float> LightSize = { 100.0f, 100.0f };
+	const FString LightSizeHash = CADDatasmithInspect::FindValueFromMetaKey(Proxy, TEXT("UE_LightSize"));
+	bool lSizeValid = CADDatasmithInspect::ParseVector(LightSizeHash, LightSize);
+
 	Description.Transform = Proxy->GetTransform();
 	Description.TypeId = LightTypeId;
 	Description.Color = LightColor;
 	Description.Intensity = LightIntensity;
+	Description.Size = LightSize;
 
-	if (!LTypeValid || !lColorValid || !lIntensityValid)
+	if (!LTypeValid || !lColorValid || !lIntensityValid || !lSizeValid)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[CAD Light Manager] Invalid light description for actor %s"), *Proxy->GetName());
 		Description.TypeId = -1;
@@ -68,23 +73,21 @@ AActor* UCADLightManager::SpawnLight(AActor* Proxy, const LightDescription& Desc
 	{
 		APointLight* A = GetWorld()->SpawnActor<APointLight>(APointLight::StaticClass(), Description.Transform);
 		TObjectPtr<UPointLightComponent> Component = A->PointLightComponent;
-		Component->IntensityUnits = ELightUnits::Lumens;
+		Component->SetIntensityUnits(ELightUnits::Lumens);
 		Component->SetIntensity(Description.Intensity);
 		Component->SetLightColor(Description.Color);
-		Component->AttenuationRadius = FMath::Max3(Description.Transform.GetScale3D().X, Description.Transform.GetScale3D().Y, Description.Transform.GetScale3D().Z) * 100.0f;
-		//Component->SetVisibility(true, true);
+		Component->SetAttenuationRadius(FMath::Max(Description.Size[0], Description.Size[1]));
 		return A;
 	}
 	else if (Description.TypeId == 1) // Rect Light
 	{
 		ARectLight* A = GetWorld()->SpawnActor<ARectLight>(ARectLight::StaticClass(), Description.Transform);
 		TObjectPtr<URectLightComponent> Component = A->RectLightComponent;
-		Component->IntensityUnits = ELightUnits::Lumens;
+		Component->SetIntensityUnits(ELightUnits::Lumens);
 		Component->SetIntensity(Description.Intensity);
 		Component->SetLightColor(Description.Color);
-		Component->SourceWidth = Description.Transform.GetScale3D().X * 100.0f;
-		Component->SourceHeight = Description.Transform.GetScale3D().Y * 100.0f;
-		//Component->SetVisibility(true, true);
+		Component->SetSourceWidth(Description.Size[0]);
+		Component->SetSourceHeight(Description.Size[1]);
 		return A;
 	}
 	
@@ -94,17 +97,11 @@ AActor* UCADLightManager::SpawnLight(AActor* Proxy, const LightDescription& Desc
 void UCADLightManager::HideProxyMesh(AActor* Proxy)
 {
 	if (!Proxy) return;
+	UStaticMeshComponent* SMC = Proxy->FindComponentByClass<UStaticMeshComponent>();
+	if (!SMC) return;
 
-	/*TArray<UStaticMeshComponent*> StaticMeshComponents;
-	Proxy->GetComponents<UStaticMeshComponent>(StaticMeshComponents);
-	for (UStaticMeshComponent* SMC : StaticMeshComponents)
-	{
-		if (SMC)
-		{
-			SMC->SetHiddenInGame(true);
-			SMC->SetCastShadow(false);
-			SMC->SetVisibility(false, true);
-			SMC->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-	}*/
+	SMC->SetVisibility(false);
+	SMC->SetHiddenInGame(true);
+	SMC->SetCastShadow(false);
+	SMC->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

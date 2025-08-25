@@ -112,3 +112,27 @@ bool CADDatasmithInspect::ParseColor(const FString StringValue, FLinearColor& Ou
 	OutColor = FLinearColor(R, G, B, 255.0f);
 	return true;
 }
+
+bool CADDatasmithInspect::ParseVector(const FString StringValue, TArray<float>& OutVector, const int8 size)
+{
+	TArray<FString> VecComponents;
+	VecComponents.Reserve(size);
+
+	FString TempString = StringValue;
+	TempString.TrimStartAndEndInline();
+	TempString.ParseIntoArray(VecComponents, TEXT(","), true);
+	if (VecComponents.Num() != size) return false;
+
+	for (int i = 0; i < size; i++)
+	{
+		float value;
+		VecComponents[i].TrimStartAndEndInline();
+		if (!ParseFloat(VecComponents[i], value)) {
+			OutVector.Empty();
+			return false;
+		}
+		OutVector.Add(value);
+	}
+
+	return true;
+}

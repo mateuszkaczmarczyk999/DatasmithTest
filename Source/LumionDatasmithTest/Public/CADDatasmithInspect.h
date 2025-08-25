@@ -12,4 +12,5 @@ namespace CADDatasmithInspect
 	bool ParseInt(const FString StringValue, int32& OutValue);
 	bool ParseFloat(const FString StringValue, float& OutValue);
 	bool ParseColor(const FString StringValue, FLinearColor& OutColor);
+	bool ParseVector(const FString StringValue, TArray<float>& OutVector, const int8 size = 2);
 }

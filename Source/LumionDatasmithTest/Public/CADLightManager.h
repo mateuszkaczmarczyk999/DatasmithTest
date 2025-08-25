@@ -9,9 +9,10 @@
 
 struct LightDescription {
 	FTransform Transform;
-	int32 TypeId; // 0 for Point Light, 1 for Rect Light
+	int32 TypeId;
 	FLinearColor Color;
 	float Intensity;
+	TArray<float> Size;
 };
 
 UCLASS()
