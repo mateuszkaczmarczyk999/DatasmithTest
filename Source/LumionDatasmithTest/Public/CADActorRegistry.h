@@ -18,7 +18,6 @@ public:
 	void Unbind();
 	void OnSpawnedActor(AActor* Actor);
 	void OnWorldTick(UWorld* World, ELevelTick TickType, float DeltaSeconds);
-	void OnSceneTransformChanged(USceneComponent* SceneComponent, EUpdateTransformFlags Flags, ETeleportType Teleport);
 
 private:
 	FDelegateHandle SpawnedActorHandler;

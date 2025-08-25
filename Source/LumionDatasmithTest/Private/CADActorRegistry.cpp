@@ -53,26 +53,6 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 	if (!Actor) return;
 	UE_LOG(LogTemp, Log, TEXT("CAD Actor Spawned: %s"), *Actor->GetName());
 
-	/*if (USceneComponent* scene = Actor->GetRootComponent())
-	{
-		if (!scene->TransformUpdated.IsBoundToObject(this))
-		{
-			scene->TransformUpdated.AddUObject(this, &UCADActorRegistry::OnSceneTransformChanged);
-		}
-	}
-
-	TInlineComponentArray<USceneComponent*> SceneComps(Actor);
-	for (USceneComponent* Comp : SceneComps)
-	{
-		if (!Comp) continue;
-		// Avoid double-binding if you might call this again
-		if (!Comp->TransformUpdated.IsBoundToObject(this))
-		{
-			Comp->TransformUpdated.AddUObject(
-				this, &UCADActorRegistry::OnSceneTransformChanged);
-		}
-	}*/
-
 	GetWorld()->GetTimerManager().SetTimerForNextTick(
 		FTimerDelegate::CreateWeakLambda(this, [this, Actor]()
 			{
@@ -83,13 +63,3 @@ void UCADActorRegistry::OnSpawnedActor(AActor* Actor)
 	);
 }
 
-void UCADActorRegistry::OnSceneTransformChanged(USceneComponent* SceneComponent, EUpdateTransformFlags Flags, ETeleportType Teleport)
-{
-	if (!SceneComponent) return;
-	if (AActor* A = SceneComponent->GetOwner())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Transform changed on %s -> %s"),
-			*SceneComponent->GetName(),
-			*A->GetActorTransform().ToHumanReadableString());
-	}
-}
