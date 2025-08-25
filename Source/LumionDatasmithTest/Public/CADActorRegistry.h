@@ -16,6 +16,7 @@ public:
 	void Bind();
 	void Unbind();
 	void OnSpawnedActor(AActor* Actor);
+	void OnSceneTransformChanged(USceneComponent* SceneComponent, EUpdateTransformFlags Flags, ETeleportType Teleport);
 
 private:
 	FDelegateHandle SpawnedActorHandler;

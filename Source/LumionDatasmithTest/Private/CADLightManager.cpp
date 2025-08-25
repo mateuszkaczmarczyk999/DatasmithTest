@@ -14,6 +14,8 @@ void UCADLightManager::OnActorSpawned(AActor* Proxy)
 {
 	if (!Proxy) return;
 
+	if (!CADDatasmithInspect::HasMetaKey(Proxy, TEXT("UE_LightType"))) return;
+
 	const FName LigthProxyChecked(TEXT("Rhino_Light_Proxy_Exist"));
 	if (Proxy->ActorHasTag(LigthProxyChecked)) return;
 
@@ -97,6 +99,7 @@ AActor* UCADLightManager::SpawnLight(AActor* Proxy, const LightDescription& Desc
 void UCADLightManager::HideProxyMesh(AActor* Proxy)
 {
 	if (!Proxy) return;
+
 	UStaticMeshComponent* SMC = Proxy->FindComponentByClass<UStaticMeshComponent>();
 	if (!SMC) return;
 

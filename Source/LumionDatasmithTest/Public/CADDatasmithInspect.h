@@ -6,6 +6,7 @@
 namespace CADDatasmithInspect
 {
 	bool ReadAndWriteDatasmithMetaData(UObject* Object, TArray<TPair<FName, FString>>& Out);
+	bool HasMetaKey(UObject* Object, FName KeyName);
 	FString FindValueFromMetaKey(UObject* Object, FName KeyName);
 	bool ReadAndWriteDatasmithTags(AActor* Actor, TArray<FName>& Out);
 	void LogActorMetaAndTagsData(AActor* Actor);

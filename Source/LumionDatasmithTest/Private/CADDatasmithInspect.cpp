@@ -16,9 +16,21 @@ bool CADDatasmithInspect::ReadAndWriteDatasmithMetaData(UObject* Object, TArray<
 	return OutputData.Num() > 0;
 }
 
+bool CADDatasmithInspect::HasMetaKey(UObject* Object, FName KeyName)
+{
+	if (!Object) return false;
+
+	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
+	{
+		return UserData->MetaData.Contains(KeyName);
+	}
+	return false;
+}
+
 FString CADDatasmithInspect::FindValueFromMetaKey(UObject* Object, FName KeyName)
 {
 	if (!Object) return TEXT("None");
+
 	if (const UDatasmithAssetUserData* UserData = UDatasmithAssetUserData::GetDatasmithUserData(Object))
 	{
 		if (const FString* Value = UserData->MetaData.Find(KeyName))
