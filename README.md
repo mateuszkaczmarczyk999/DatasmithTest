@@ -72,3 +72,4 @@ flowchart TD
 
   B -->|Manages| H[(ADatasmithRuntimeActor)]
   D -->|Parses Metadata| E
+  C -->|Parses Metadata| E
