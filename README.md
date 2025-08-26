@@ -5,6 +5,8 @@ It connects to a CAD source via Direct Link, synchronizes geometry in real-time,
 and exposes basic runtime UI controls for toggling rendering features.
 
 ---
+![App runtime preview](preview/datasmith_sync_preview.png)
+---
 
 ## Setup
 
