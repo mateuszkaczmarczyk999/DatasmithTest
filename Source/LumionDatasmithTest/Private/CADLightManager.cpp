@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CADLightManager.h"
 #include "Engine/RectLight.h"
 #include "Components/RectLightComponent.h"

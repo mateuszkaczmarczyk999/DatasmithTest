@@ -1,11 +1,7 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "CADSyncSubsystem.h"
+﻿#include "CADSyncSubsystem.h"
 #include "CADDatasmithInspect.h"
 #include "CADActorRegistry.h"
 #include "CADDirectLinkSession.h"
-
 
 void UCADSyncSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

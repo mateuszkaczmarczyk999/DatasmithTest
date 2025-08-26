@@ -1,10 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CADDirectLinkSession.h"
 #include "DatasmithRuntime.h"
 #include "DatasmithRuntimeBlueprintLibrary.h"
-
 
 void UCADDirectLinkSession::Connect()
 {

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "RuntimeUIActor.h"
 #include "RuntimeSettingsWidget.h"
 #include "Blueprint/UserWidget.h"

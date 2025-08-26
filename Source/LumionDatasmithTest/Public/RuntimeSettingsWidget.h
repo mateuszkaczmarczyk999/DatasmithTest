@@ -1,4 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+*   URuntimeSettingsWidget (extends UUserWidget, binds call procedures and state with UI).
+*   Implements the runtime settings UI for controlling Datasmith connection, sync operations,
+*   and rendering options such as ray tracing and shadows.
+*
+* Responsibilities:
+*   - Build UI on construction and bind widget events.
+*   - Expose controls for:
+*       - Toggling ray tracing and shadow rendering.
+*       - Triggering Datasmith operations: connect, re-sync, update lights.
+*       - Displaying current connection status text.
+*/
 
 #pragma once
 

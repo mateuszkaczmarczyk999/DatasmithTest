@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CADActorRegistry.h"
 #include "CADDatasmithInspect.h"
 #include "CADLightManager.h"
