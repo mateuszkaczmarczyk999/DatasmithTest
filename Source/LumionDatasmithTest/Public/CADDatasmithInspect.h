@@ -1,4 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Namespace:
+*   CADDatasmithInspect provides utility functions for inspecting and parsing Datasmith metadata and tags.
+*
+* Responsibilities:
+*   - Extract metadata snapshots and tags from objects/actors.
+*   - Query metadata by key and retrieve values (strings, ints, floats, colors, vectors).
+*   - Convert metadata into structured output (maps, arrays, key-value pairs).
+*   - Log actor metadata and tags for debugging.
+*/
 
 #pragma once
 #include "CoreMinimal.h"

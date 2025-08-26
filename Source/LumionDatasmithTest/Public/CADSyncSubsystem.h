@@ -1,4 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+	UCADSyncSubsystem (extends UGameInstanceSubsystem, so it persists for the lifetime of the game instance).
+	It serves as a facade for managing Datasmith connections via UCADDirectLinkSession
+	and encapsulates actor registration and synchronization through UCADActorRegistry.
+
+Responsibilities:
+	- Initialize and shut down CAD real-time session logic (Initialize, Deinitialize).
+	- Provide callable functions to:
+		- Establish a connection to the CAD source (Connect).
+		- Refresh or re-synchronize CAD data (ReSync).
+		- Update lights from CAD metadata (UpdateLights).
+		- Report the current connection state (IsConnected).
+ */
 
 #pragma once
 

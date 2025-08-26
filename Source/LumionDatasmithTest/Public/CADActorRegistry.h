@@ -1,4 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+*   UCADActorRegistry maintains a registry of spawned CAD actors and manages their lifecycle
+*   during a Datasmith Direct Link session.
+*
+* Responsibilities:
+*   - Bind and unbind to world delegates for actor spawn and tick events (Bind, Unbind).
+*   - Track newly spawned actors and process them (OnSpawnedActor).
+*   - Handle world ticks to monitor/update actors (OnWorldTick).
+*   - Check registered actors for light-related metadata (CheckActorsForLightData).
+*   - Destroy Datasmith related actors (DestroyActors).
+*
+* Collaborators:
+*   - Uses UCADLightManager to apply light data extracted from actor metadata.
+*/
 
 #pragma once
 
@@ -6,7 +20,6 @@
 #include "Tickable.h"
 #include "UObject/NoExportTypes.h"
 #include "CADActorRegistry.generated.h"
-
 
 UCLASS()
 class LUMIONDATASMITHTEST_API UCADActorRegistry : public UObject

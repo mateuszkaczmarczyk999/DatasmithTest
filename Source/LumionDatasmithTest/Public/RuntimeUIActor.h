@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+*   ARuntimeUIActor (extends AActor, serves as a world-anchored entry point).
+*   Provides an in-world actor responsible for spawning and owning the runtime UI widget.
+*
+* Responsibilities:
+*   - On BeginPlay, create an instance of the assigned settings widget (WidgetClass).
+*   - Maintain a reference to the active widget (WidgetInstance).
+*/
 
 #pragma once
 

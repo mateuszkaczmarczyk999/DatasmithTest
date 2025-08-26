@@ -1,11 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+*   UCADDirectLinkSession encapsulates the management of a Datasmith Direct Link session,
+*   including connection state, proxy initialization, and anchor handling for live CAD synchronization.
+*
+* Responsibilities:
+*   - Establish and close the Datasmith connection (Connect, Disconnect).
+*   - Report the current connection state (IsConnected).
+*   - Flush session (Flush).
+*   - Internally manage:
+*       - Anchor actor for Datasmith runtime data (SpawnAnchor).
+*       - DirectLink proxy initialization (InitProxy).
+*/
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "CADDirectLinkSession.generated.h"
-
 
 UCLASS()
 class LUMIONDATASMITHTEST_API UCADDirectLinkSession : public UObject

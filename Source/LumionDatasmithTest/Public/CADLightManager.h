@@ -1,11 +1,26 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Class:
+*   UCADLightManager handles the processing of Datasmith light proxy actors and transforms their metadata
+*   into functional light components in the scene.
+*
+* Responsibilities:
+*   - Process incoming light proxy actors and enqueue their descriptions (ProcessLightProxy).
+*   - Update lights each tick based on the processing queue (OnTick).
+*   - Parse light metadata into structured descriptions (ReadDescriptionFromProxy).
+*   - Spawn corresponding Unreal light actors (SpawnLight).
+*   - Hide proxy meshes once processed (HideProxyMesh).
+*
+* Threading Model:
+*   - Metadata parsing and light description creation are performed on a worker thread.
+*   - Uses LightDescription POD struct to store parsed light data.
+*   - Actual light actor spawning and scene updates run on the Game Thread.
+*/
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "CADLightManager.generated.h"
-
 
 struct LightDescription {
 	int32 TypeId;
